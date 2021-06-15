@@ -133,9 +133,10 @@ class History extends StatelessWidget {
       control.updateListView();
       Get.snackbar('Successfully', '1 entry Deleted.',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.white,
           dismissDirection: SnackDismissDirection.HORIZONTAL,
           duration: Duration(milliseconds: 1000),
-          margin: EdgeInsets.all(15));
+          margin: EdgeInsets.all(10));
     }
   }
 

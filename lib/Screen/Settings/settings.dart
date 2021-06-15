@@ -10,6 +10,7 @@ import 'package:qr_scann/Pages/Custom%20Search/custom_search_options.dart';
 import 'package:qr_scann/Pages/ScanProduct/scan_product.dart';
 import 'package:qr_scann/ThemeProvider/theme.dart';
 
+
 class Settings extends StatelessWidget {
   final controller = Get.put(SettingsController());
 
@@ -305,12 +306,14 @@ class Settings extends StatelessWidget {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 50.0),
-                        child: ListTile(
-                          title: Text("Camera"),
-                          subtitle: Text("Camera 1(Recommended)"),
-                          onTap: () {
-                            controller.changeCamera();
-                          },
+                        child: Obx(
+                          () => ListTile(
+                            title: Text("Camera"),
+                            subtitle: Text(controller.selectedCamera.value),
+                            onTap: () {
+                              controller.changeCamera();
+                            },
+                          ),
                         ),
                       ),
                       Divider(),

@@ -97,6 +97,7 @@ class SettingsController extends GetxController {
         groupValue: selectedCamera.value,
         onChanged: (value) async {
           onChangeCamera(value);
+          update();
         },
         items: cameras,
         itemBuilder: (item) => RadioButtonBuilder(item),

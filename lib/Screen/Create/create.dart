@@ -16,15 +16,15 @@ import 'create_all_result.dart';
 
 class Create extends StatelessWidget {
   var textValue;
-  var type = "Content from clipboard";
-  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
   void _getClipboard() async {
     ClipboardData data = await Clipboard.getData(Clipboard.kTextPlain);
+    print(data);
     textValue = data.text;
   }
 
   @override
   Widget build(BuildContext context) {
+    _getClipboard();
     return Scaffold(
       body: Column(
         children: [
@@ -74,7 +74,11 @@ class Create extends StatelessWidget {
                       title: Text("Content from clipboard"),
                       onTap: () {
                         _getClipboard();
-                        Get.to(CreateAllResult(textValue, type, date));
+                        Get.to(CreateAllResult(
+                            textValue.toString(),
+                            "Content from clipboard",
+                            DateFormat('dd-MM-yyyy  kk:mm')
+                                .format(DateTime.now())));
                       },
                     ),
                     //WebSite

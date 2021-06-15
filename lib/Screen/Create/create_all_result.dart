@@ -126,7 +126,7 @@ class CreateAllResult extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 15.0, left: 15.0),
                       child: Text(
-                        type,
+                        date,
                         style: TextStyle(
                           fontSize: 18.0,
                         ),

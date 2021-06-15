@@ -77,9 +77,7 @@ class Scanner extends StatelessWidget {
                           ),
                         ],
                       ),
-                      onTap: () {
-                        //  Give it a try
-                      },
+                      onTap: control.getPhotoByGallery,
                     ),
                     InkWell(
                       onTap: () {

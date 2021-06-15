@@ -1,26 +1,80 @@
+import 'dart:io';
+
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_code_tools/qr_code_tools.dart';
 import 'package:qr_scann/DataBase/databasehelper.dart';
 import 'package:qr_scann/DataBase/getdata.dart';
 import 'package:qr_scann/Pages/ResultQR/result_qr_page.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 
 class ScanController extends GetxController {
+  final picker = ImagePicker();
+  var qrcodeFile;
+  var data;
+
   @override
   void onInit() {
     super.onInit();
     initPlayer();
+    Stream.fromFuture(getTemporaryDirectory())
+        .flatMap((tempDir) {
+          File qrCodeFile = File('${tempDir.path}/help1.jpg');
+          bool exists = qrCodeFile.existsSync();
+          if (exists) {
+            return Stream.value(qrCodeFile);
+          } else {
+            return Stream.fromFuture(rootBundle.load("assets/help1.jpg"))
+                .flatMap((bytes) => Stream.fromFuture(qrCodeFile.writeAsBytes(
+                    bytes.buffer.asUint8List(
+                        bytes.offsetInBytes, bytes.lengthInBytes))));
+          }
+        })
+        .flatMap((file) =>
+            Stream.fromFuture(QrCodeToolsPlugin.decodeFrom(file.path)))
+        .listen((data) {
+          this.data = data;
+          update();
+        });
+  }
+
+  void getPhotoByGallery() {
+    Stream.fromFuture(picker.getImage(source: ImageSource.gallery))
+        .flatMap((file) {
+      qrcodeFile = file.path;
+      return Stream.fromFuture(QrCodeToolsPlugin.decodeFrom(file.path));
+    }).listen((data) {
+      this.data = data;
+      update();
+    }).onError((error, stackTrace) {
+      print('++ ${error.toString()}');
+      Get.back();
+      Get.snackbar(
+        "Code not Found",
+        "Crop the code from the photos then try.",
+        backgroundColor: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: EdgeInsets.all(10),
+      );
+    });
+    if (data != null) {
+      Get.to(() => ResultQRPage(data, "BarcodeFormat.QRCODE", date));
+    } else {
+      Get.back();
+    }
   }
 
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController controller;
-
   AudioCache audioCache;
   AudioPlayer advancedPlayer;
 
@@ -66,7 +120,6 @@ class ScanController extends GetxController {
   changeCamera() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final soundpref = preferences.getString("ChangeCamera");
-
     if (soundpref == null) {
       camera = CameraFacing.back;
     } else if (soundpref == "Front Camera") {
@@ -124,7 +177,7 @@ class ScanController extends GetxController {
         Vibration.vibrate();
       }
       if (copy.value) {
-        Clipboard.setData(new ClipboardData(text: result));
+        Clipboard.setData(ClipboardData(text: result));
       }
 
       final data = await Get.to(() => ResultQRPage(result, type, date));
@@ -141,6 +194,7 @@ class ScanController extends GetxController {
 
   DatabaseHelper helper = DatabaseHelper();
   Databasedata databasedata = Databasedata();
+
   void _save() async {
     databasedata.saveResult = result.toString();
     databasedata.date = date.toString();

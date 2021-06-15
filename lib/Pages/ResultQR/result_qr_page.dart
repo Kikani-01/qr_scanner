@@ -116,7 +116,7 @@ class ResultQRPage extends StatelessWidget {
                       padding: const EdgeInsets.all(15.0),
                       child: GestureDetector(
                         child: Text(
-                          result,
+                          result.toString(),
                           style: TextStyle(
                             fontSize: 20,
                           ),
@@ -275,9 +275,9 @@ class ResultQRPage extends StatelessWidget {
   }
 
   void _copyClipboard() {
+    Clipboard.setData(ClipboardData(text: result));
     _scaffoldKey.currentState
         .showSnackBar(SnackBar(content: Text("Copied to clipboard")));
-    Clipboard.setData(new ClipboardData(text: init.result.value));
   }
 
   Widget popMenu(context) {

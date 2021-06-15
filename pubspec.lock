@@ -366,6 +366,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.5"
+  qr_code_tools:
+    dependency: "direct main"
+    description:
+      name: qr_code_tools
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.7"
   qr_flutter:
     dependency: "direct main"
     description:
@@ -373,6 +380,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.0"
+  rxdart:
+    dependency: "direct main"
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.27.1"
   share:
     dependency: "direct main"
     description:

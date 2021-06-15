@@ -49,6 +49,9 @@ dependencies:
   vibration: ^1.7.3
   get: ^3.25.1
   group_radio_button: ^1.0.1
+  qr_code_tools: ^0.0.7
+  rxdart: ^0.27.1
+
 
 dev_dependencies:
   flutter_test:
