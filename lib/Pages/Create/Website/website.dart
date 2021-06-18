@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:qr_scann/Screen/Create/create_all_result.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 import 'package:qr_scann/Screen/Create/share.dart';
 
 class WebSite extends StatelessWidget {
   var dataString;
   TextEditingController _textController =
       TextEditingController(text: "https://");
-  var type = "WebSite";
-  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
   TextStyle style = TextStyle(
     fontSize: 20.0,
   );
@@ -32,8 +29,8 @@ class WebSite extends StatelessWidget {
                 Icons.check,
               ),
               onPressed: () {
-                this.dataString = _textController.text;
-                Get.to(CreateAllResult(dataString, type, date));
+                Get.to(CreateAllBarcodes(
+                    _textController.text.toString(), 'Website', "QR Code"));
               }),
         ],
       ),

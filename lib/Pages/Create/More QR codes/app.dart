@@ -1,8 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:qr_scann/Screen/Create/create_all_result.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 
 class ListAppsPages extends StatelessWidget {
   bool _showSystemApps = true;
@@ -21,7 +20,7 @@ class ListAppsPages extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: _ListAppsPagesContent(
+      body: ListAppsPagesContent(
           includeSystemApps: _showSystemApps,
           onlyAppsWithLaunchIntent: _onlyLaunchableApps,
           key: GlobalKey()),
@@ -29,13 +28,11 @@ class ListAppsPages extends StatelessWidget {
   }
 }
 
-class _ListAppsPagesContent extends StatelessWidget {
-  var type = "Apps";
-  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
+class ListAppsPagesContent extends StatelessWidget {
   final bool includeSystemApps;
   final bool onlyAppsWithLaunchIntent;
 
-  _ListAppsPagesContent(
+  ListAppsPagesContent(
       {Key key,
       this.includeSystemApps: false,
       this.onlyAppsWithLaunchIntent: false})
@@ -67,10 +64,10 @@ class _ListAppsPagesContent extends StatelessWidget {
                                 )
                               : null,
                           onTap: () {
-                            Get.to(CreateAllResult(
+                            Get.to(CreateAllBarcodes(
                                 "https://play.google.com/store/apps/details?id=${app.packageName}",
-                                type,
-                                date));
+                                "Apps",
+                                "QR Code"));
                           },
                           title: Text('${app.appName}'),
                         ),

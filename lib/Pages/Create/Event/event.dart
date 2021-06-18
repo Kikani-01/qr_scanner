@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:qr_scann/Screen/Create/create_all_result.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 
 class Event extends StatelessWidget {
   DateTime _startDate;
   DateTime _endDate;
   var result;
-  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
-  var type = "Event";
   var _key = GlobalKey<FormState>();
   TextEditingController start = TextEditingController();
   TextEditingController end = TextEditingController();
@@ -24,7 +22,7 @@ class Event extends StatelessWidget {
           color: Colors.white,
         ),
         title: Text(
-          type,
+          "Event",
           style: TextStyle(
             color: Colors.white,
           ),
@@ -33,9 +31,15 @@ class Event extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.check),
               onPressed: () {
-                this.result = contactString();
                 if (_key.currentState.validate()) {
-                  Get.to(CreateAllResult(result, type, date));
+                  Get.to(CreateAllBarcodes(
+                      "${title.text.toString()}\n"
+                          "${start.text.toString()}\n"
+                          "${end.text.toString()}\n"
+                          "${location.text.toString()}"
+                          "${discription.text.toString()}",
+                      "Event",
+                      "QR Code"));
                 }
               })
         ],
@@ -99,7 +103,6 @@ class Event extends StatelessWidget {
                     child: IgnorePointer(
                       child: TextFormField(
                         controller: end,
-
                         focusNode: AlwaysDisabledFocusNode(),
                         cursorColor: Colors.orange,
                         validator: (value) =>
@@ -151,7 +154,7 @@ class Event extends StatelessWidget {
   }
 
   _selectStartDate(BuildContext context) async {
-     DateTime newSelectedDate = await showDatePicker(
+    DateTime newSelectedDate = await showDatePicker(
       context: context,
       initialDate: _startDate != null ? _startDate : DateTime.now(),
       firstDate: DateTime(2010),
@@ -181,22 +184,6 @@ class Event extends StatelessWidget {
         ..selection = TextSelection.fromPosition(TextPosition(
             offset: end.text.length, affinity: TextAffinity.upstream));
     }
-  }
-
-  contactString() {
-    String firstName = this.start.text.toString();
-    String lastName = this.end.text.toString();
-    String title = this.title.text.toString();
-    String location = this.location.text.toString();
-    String discription = this.discription.text.toString();
-
-    return '''
-  $title
-  $firstName
-  $lastName
-  $location
-  $discription
-   ''';
   }
 }
 

@@ -10,8 +10,6 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qr_code_tools/qr_code_tools.dart';
-import 'package:qr_scann/DataBase/databasehelper.dart';
-import 'package:qr_scann/DataBase/getdata.dart';
 import 'package:qr_scann/Pages/ResultQR/result_qr_page.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,6 +61,7 @@ class ScanController extends GetxController {
         "Crop the code from the photos then try.",
         backgroundColor: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.black,
         margin: EdgeInsets.all(10),
       );
     });
@@ -166,7 +165,6 @@ class ScanController extends GetxController {
       result = scanData.code;
       if (result != null) {
         await controller.pauseCamera();
-        _save();
       }
       type = scanData.format.toString();
 
@@ -190,20 +188,5 @@ class ScanController extends GetxController {
         controller.pauseCamera();
       }
     });
-  }
-
-  DatabaseHelper helper = DatabaseHelper();
-  Databasedata databasedata = Databasedata();
-
-  void _save() async {
-    databasedata.saveResult = result.toString();
-    databasedata.date = date.toString();
-    databasedata.isFavourite = 1;
-    var save;
-    if (databasedata.id != null) {
-      save = await helper.updateNote(databasedata);
-    } else {
-      save = await helper.insertNote(databasedata);
-    }
   }
 }

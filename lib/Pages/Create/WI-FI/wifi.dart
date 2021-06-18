@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:qr_scann/Screen/Create/create_all_result.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 
 class WiFi extends StatelessWidget {
   TextEditingController networkName = TextEditingController();
@@ -12,8 +11,6 @@ class WiFi extends StatelessWidget {
   var type = ['WPA/WPA2', 'WEP', '_'];
   var result;
   var current = 'WPA/WPA2'.obs;
-  var typey = "Wi-Fi";
-  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -23,19 +20,19 @@ class WiFi extends StatelessWidget {
           color: Colors.white,
         ),
         title: Text(
-          typey,
+          "Wi-Fi",
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
-              this.result = contactString();
               if (_globalKey.currentState.validate()) {
-                Get.to(CreateAllResult(
-                  result,
-                  typey,
-                  date,
+                Get.to(CreateAllBarcodes(
+                  "${networkName.text.toString()}"
+                      "${this.password.text.toString()}",
+                 "Wi-Fi",
+                  "QR Code",
                 ));
               }
             },
@@ -121,14 +118,4 @@ class WiFi extends StatelessWidget {
     );
   }
 
-  contactString() {
-    String firstName = this.networkName.text.toString();
-    String lastName = this.password.text.toString();
-
-    return '''
-  $firstName
-  $current
-  $lastName
-   ''';
-  }
 }

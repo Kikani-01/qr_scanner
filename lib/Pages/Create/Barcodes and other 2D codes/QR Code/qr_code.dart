@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'code.dart';
+
+import '../create_all_barcode.dart';
 
 class QRCODE extends StatelessWidget {
   TextEditingController controller = TextEditingController();
   var globalKey = new GlobalKey<FormState>();
-  var result = ''.obs;
+  var result;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,9 +22,9 @@ class QRCODE extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.check),
               onPressed: () {
-                  this.result.value = controller.text;
+                this.result = controller.text;
                 if (globalKey.currentState.validate()) {
-                  Get.to(Code(result));
+                  Get.to(CreateAllBarcodes(result, "Qr code", "QR Code"));
                 }
               })
         ],

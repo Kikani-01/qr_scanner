@@ -33,6 +33,7 @@ class CreateAllResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    save();
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
@@ -141,6 +142,18 @@ class CreateAllResult extends StatelessWidget {
     );
   }
 
+  void save() async {
+    databasedata.saveResult = result.toString();
+    databasedata.date = date.toString();
+    databasedata.isFavourite = 1;
+    var save;
+    if (databasedata.id != null) {
+      save = await helper.updateNote(databasedata);
+    } else {
+      save = await helper.insertNote(databasedata);
+    }
+    print("++");
+  }
 /*
   Widget popMenu() {
     return PopupMenuButton<MenuOption>(

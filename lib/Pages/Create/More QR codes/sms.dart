@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:qr_scann/Screen/Create/create_all_result.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 
 class SMS extends StatelessWidget {
   var _key = GlobalKey<FormState>();
   var result;
-  var type = "SMS";
-  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
   TextEditingController phone = TextEditingController();
   TextEditingController message = TextEditingController();
 
@@ -17,16 +14,18 @@ class SMS extends StatelessWidget {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          type,
+          "SMS",
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
-              this.result = phoneString();
               if (_key.currentState.validate()) {
-                Get.to(CreateAllResult(result, type, date));
+                Get.to(CreateAllBarcodes(
+                    "${phone.text.toString()} ${message.text.toString()}",
+                    "SMS",
+                    "QR Code"));
               }
             },
           ),
@@ -69,14 +68,5 @@ class SMS extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  phoneString() {
-    String email = this.phone.text.toString();
-    String message = this.message.text.toString();
-
-    return '''$email
-$message
-    ''';
   }
 }

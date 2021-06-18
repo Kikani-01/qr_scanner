@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
-import 'file:///C:/Users/MANSI%20KIKANI/Desktop/QR_scaner/QR%20Scanner/lib/Screen/Create/create_all_result.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 
 class EmailQR extends StatelessWidget {
   var _key = GlobalKey<FormState>();
   var result;
   var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
-  var type = "Email";
   TextEditingController email = TextEditingController();
   TextEditingController subject = TextEditingController();
   TextEditingController message = TextEditingController();
@@ -19,16 +17,20 @@ class EmailQR extends StatelessWidget {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          type,
+          "Email",
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
-              this.result = emailString();
               if (_key.currentState.validate()) {
-                Get.to(CreateAllResult(result, type, date));
+                Get.to(CreateAllBarcodes(
+                    "${email.text.toString()}\n"
+                        "${subject.text.toString()}\n"
+                        "${message.text.toString()}",
+                    "Email",
+                    "QR Code"));
               }
             },
           ),
@@ -83,16 +85,5 @@ class EmailQR extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  emailString() {
-    String email = this.email.text.toString();
-    String subject = this.subject.text.toString();
-    String message = this.message.text.toString();
-
-    return '''$email
-$subject
-$message
-    ''';
   }
 }

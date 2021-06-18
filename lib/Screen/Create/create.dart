@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qr_scann/Pages/Ads/add.dart';
 import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/barcodes_and_other_2d_codes.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 import 'package:qr_scann/Pages/Create/Contact/contact.dart';
 import 'package:qr_scann/Pages/Create/Event/event.dart';
 import 'package:qr_scann/Pages/Create/Location/location.dart';
@@ -11,8 +11,6 @@ import 'package:qr_scann/Pages/Create/More%20QR%20codes/more_qr_codes.dart';
 import 'package:qr_scann/Pages/Create/WI-FI/wifi.dart';
 import 'package:qr_scann/Pages/Create/Website/website.dart';
 import 'package:qr_scann/Screen/Create/share.dart';
-
-import 'create_all_result.dart';
 
 class Create extends StatelessWidget {
   var textValue;
@@ -74,11 +72,8 @@ class Create extends StatelessWidget {
                       title: Text("Content from clipboard"),
                       onTap: () {
                         _getClipboard();
-                        Get.to(CreateAllResult(
-                            textValue.toString(),
-                            "Content from clipboard",
-                            DateFormat('dd-MM-yyyy  kk:mm')
-                                .format(DateTime.now())));
+                        Get.to(CreateAllBarcodes(textValue.toString(),
+                            "Content from clipboard", "QR Code"));
                       },
                     ),
                     //WebSite

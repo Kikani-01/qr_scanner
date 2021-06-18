@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/create_all_barcode.dart';
 import 'package:qr_scann/Screen/Create/share.dart';
-import 'contact_code.dart';
 
 class Contact extends StatelessWidget {
   TextEditingController firstName = new TextEditingController();
@@ -18,9 +17,6 @@ class Contact extends StatelessWidget {
   TextEditingController country = new TextEditingController();
   TextEditingController website = new TextEditingController();
   TextEditingController notes = new TextEditingController();
-  var type = "Contact";
-  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
-  int isFavourite = 1;
   var _key = GlobalKey<FormState>();
 
   @override
@@ -31,7 +27,7 @@ class Contact extends StatelessWidget {
           color: Colors.white,
         ),
         title: Text(
-          type,
+          "Contact",
           style: TextStyle(color: Colors.white),
         ),
         actions: [
@@ -39,23 +35,22 @@ class Contact extends StatelessWidget {
               icon: Icon(Icons.check),
               onPressed: () {
                 if (_key.currentState.validate()) {
-                  Get.to(ContactCode(
-                    this.firstName.text.toString(),
-                    this.lastName.text.toString(),
-                    this.company.text.toString(),
-                    this.jobTitle.text.toString(),
-                    this.phoneNumber.text.toString(),
-                    this.email.text.toString(),
-                    this.streetAddress.text.toString(),
-                    this.postcode.text.toString(),
-                    this.city.text.toString(),
-                    this.region.text.toString(),
-                    this.country.text.toString(),
-                    this.website.text.toString(),
-                    this.notes.text.toString(),
-                    this.type,
-                    this.date,
-                  ));
+                  Get.to(CreateAllBarcodes(
+                      "${firstName.text.toString()} "
+                          "${lastName.text.toString()} "
+                          "${company.text.toString()} "
+                          "${jobTitle.text.toString()} "
+                          "${phoneNumber.text.toString()} "
+                          "${email.text.toString()} "
+                          "${streetAddress.text.toString()} "
+                          "${postcode.text.toString()} "
+                          "${city.text.toString()} "
+                          "${region.text.toString()} "
+                          "${country.text.toString()} "
+                          "${website.text.toString()} "
+                          "${notes.text.toString()} ",
+                      "Contact",
+                      "QR Code"));
                 }
               }),
         ],
@@ -410,5 +405,22 @@ class Contact extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String convert() {
+    return "${firstName.text.toString()}"
+            "${lastName.text.toString()}"
+            "${company.text.toString()}"
+            "${jobTitle.text.toString()}"
+            "${phoneNumber.text.toString()}"
+            "${email.text.toString()}"
+            "${streetAddress.text.toString()}"
+            "${postcode.text.toString()}"
+            "${city.text.toString()}"
+            "${region.text.toString()}"
+            "${country.text.toString()}"
+            "${website.text.toString()}"
+            "${notes.text.toString()}"
+        .toString();
   }
 }

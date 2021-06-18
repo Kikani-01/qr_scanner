@@ -2,81 +2,116 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_scann/DataBase/databasehelper.dart';
 import 'package:qr_scann/DataBase/getdata.dart';
+import 'package:qr_scann/Pages/Create/Barcodes%20and%20other%202D%20codes/Code/code_bar.dart';
 import 'package:qr_scann/Screen/Create/create_all_result.dart';
 import 'package:share/share.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ViewCode extends StatelessWidget {
+class CreateAllBarcodes extends StatelessWidget {
   var result;
-  var type;
-  var date;
-  int isFavourite;
-  ViewCode({this.result, this.type, this.date, this.isFavourite});
-
-  DatabaseHelper helper = DatabaseHelper();
-  Databasedata databasedata = Databasedata();
-  List noteList = <Databasedata>[].obs;
-  MenuOption select;
-  var format;
-  var codeScanner;
-
-  var add = "Add to favourites".obs;
-
+  final String type;
+  final String category;
+  CreateAllBarcodes(this.result, this.type, this.category);
+  GlobalKey globalKey = new GlobalKey();
+  var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
   final TextEditingController _textController = TextEditingController();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  void customLaunch(command) async {
-    if (await canLaunch(command)) {
-      await launch(command);
-    } else {
-      print("Could not launch $command ");
+  checkType(String test) {
+    switch (test) {
+      case "Qr code":
+        {
+          return QRCode();
+        }
+        break;
+      case "code 39":
+        {
+          return Code39();
+        }
+        break;
+      case "code 93":
+        {
+          return Code93();
+        }
+        break;
+      case "code 128":
+        {
+          return Code128();
+        }
+        break;
+      case "code bar":
+        {
+          return CODEBar();
+        }
+        break;
+      case "Data matrix":
+        {
+          return DataMatrix();
+        }
+        break;
+      case "EAN 8":
+        {
+          return EAN8();
+        }
+        break;
+      case "EAN 13":
+        {
+          return EAN13();
+        }
+        break;
+      case "code bar":
+        {
+          return CODEBar();
+        }
+        break;
+      case "Contact":
+        {
+          return QRCode();
+        }
+        break;
+
+      default:
+        {
+          return QRCode();
+        }
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    databasedata.isFavourite = isFavourite;
-    if (type != null)
-      format = type.split("BarcodeFormat.").join("").toString().toUpperCase();
-    if (type != null) format = "Qr code";
+    save();
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_sharp),
-            onPressed: () {
-              sendDataBack(context);
-            }),
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        backgroundColor: Theme.of(context).primaryColor,
         title: Text(
-          format,
+          category,
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              _delete(context, databasedata);
-              sendDataBack(context);
-            },
-          ),
           Builder(builder: (context) {
             return IconButton(
                 icon: Icon(Icons.share),
                 onPressed: () {
-                  context.findRenderObject();
-                  Share.share(
-                    result,
-                    subject: result,
-                  );
+                  final RenderBox box = context.findRenderObject();
+                  Share.share(result,
+                      subject: result,
+                      sharePositionOrigin:
+                          box.localToGlobal(Offset.zero) & box.size);
                 });
           }),
+          SizedBox(
+            width: 10,
+          ),
+          Icon(Icons.print),
+          SizedBox(
+            width: 10,
+          ),
           popMenu(),
         ],
       ),
@@ -84,6 +119,31 @@ class ViewCode extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: RepaintBoundary(
+                      key: globalKey,
+                      child: SfBarcodeGenerator(
+                        value: result,
+                        symbology: checkType(type),
+                        showValue: false,
+                        barColor: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: GestureDetector(
@@ -101,7 +161,7 @@ class ViewCode extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Text(
-                format,
+                type,
                 style: TextStyle(
                   fontSize: 15,
                 ),
@@ -124,7 +184,7 @@ class ViewCode extends StatelessWidget {
               highlightColor: Colors.orange,
               splashColor: Colors.orange[200],
               onTap: () {
-                Get.to(CreateAllResult(result, format, date));
+                Get.to(CreateAllResult(result, category, date));
               },
               child: Padding(
                 padding: const EdgeInsets.only(
@@ -160,11 +220,9 @@ class ViewCode extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                            icon: databasedata.isFavourite == 1
-                                ? Icon(Icons.star_border)
-                                : Icon(Icons.star),
+                            icon: Icon(Icons.star_border),
                             onPressed: () {
-                              favourite();
+                              // favourite();
                             }),
                         IconButton(
                           icon: Icon(Icons.edit),
@@ -175,7 +233,7 @@ class ViewCode extends StatelessWidget {
                         IconButton(
                           icon: Icon(Icons.copy),
                           onPressed: () {
-                            _copyClipboard();
+                            copyClipboard();
                           },
                         ),
                         SizedBox(
@@ -218,45 +276,63 @@ class ViewCode extends StatelessWidget {
     );
   }
 
-  void sendDataBack(BuildContext context) {
-    bool send;
-    Navigator.pop(context, send);
+  MenuOption select;
+
+  Widget popMenu() {
+    return PopupMenuButton<MenuOption>(
+      onSelected: (MenuOption result) {
+        select = result;
+        switch (select) {
+          case MenuOption.Favorites:
+            {
+              // favourite();
+            }
+            break;
+          case MenuOption.Notes:
+            {
+              showAlertDialog();
+            }
+            break;
+          case MenuOption.Copy:
+            {
+              copyClipboard();
+            }
+            break;
+        }
+      },
+      icon: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
+        PopupMenuItem(
+          child: Text("Favorites"),
+          value: MenuOption.Favorites,
+        ),
+        PopupMenuItem(
+          child: Text("Notes"),
+          value: MenuOption.Notes,
+        ),
+        PopupMenuItem(
+          child: Text("Copy Code"),
+          value: MenuOption.Copy,
+        )
+      ],
+    );
   }
 
-  favourite() {
-    if (databasedata.isFavourite == 1) {
-      _save();
-      add.value = "Remove to favourite";
-      databasedata.isFavourite = 2;
-    } else if (databasedata.isFavourite == 2) {
-      _save();
-      add.value = "Add to favourite";
-      databasedata.isFavourite = 1;
-    }
-  }
-
-  void _delete(BuildContext context, Databasedata databasedata) async {
-    int result = await helper.deleteNote(databasedata.id);
-    if (result != 0) {
-      updateListView();
-    }
-  }
-
-  void updateListView() {
-    final Future<Database> dbFuture = helper.initDb();
-    dbFuture.then((database) {
-      Future<List<Databasedata>> noteListFuture = helper.data();
-
-      noteListFuture.then((value) {
-        this.noteList = value;
-      });
-    });
-  }
-
-  void _copyClipboard() {
-    _scaffoldKey.currentState
-        .showSnackBar(SnackBar(content: Text("Copied to clipboard")));
+  void copyClipboard() {
+    Get.snackbar("Copied", "Copied to clipboard",
+        margin: EdgeInsets.all(10), snackPosition: SnackPosition.BOTTOM);
     Clipboard.setData(new ClipboardData(text: result));
+  }
+
+  void customLaunch(command) async {
+    if (await canLaunch(command)) {
+      await launch(command);
+    } else {
+      print("Could not launch $command ");
+    }
   }
 
   showAlertDialog() {
@@ -284,58 +360,19 @@ class ViewCode extends StatelessWidget {
     );
   }
 
-  Widget popMenu() {
-    return PopupMenuButton<MenuOption>(
-      onSelected: (MenuOption result) {
-        select = result;
-        switch (select) {
-          case MenuOption.Favorites:
-            {
-              favourite();
-            }
-            break;
-          case MenuOption.Notes:
-            {
-              showAlertDialog();
-            }
-            break;
-          case MenuOption.Copy:
-            {
-              _copyClipboard();
-            }
-            break;
-        }
-      },
-      icon: Icon(
-        Icons.more_vert,
-        color: Colors.white,
-      ),
-      itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
-        PopupMenuItem(
-          child: Obx(
-            () => Text(add.value),
-          ),
-          value: MenuOption.Favorites,
-        ),
-        PopupMenuItem(
-          child: Text("Notes"),
-          value: MenuOption.Notes,
-        ),
-        PopupMenuItem(
-          child: Text("Copy Code"),
-          value: MenuOption.Copy,
-        )
-      ],
-    );
-  }
-
-  void _save() async {
+  void save() async {
+    DatabaseHelper helper = DatabaseHelper();
+    Databasedata databasedata = Databasedata();
+    databasedata.saveResult = result.toString();
+    databasedata.date = date.toString();
+    databasedata.isFavourite = 1;
     var save;
-    if (databasedata.isFavourite == 2) {
+    if (databasedata.id != null) {
       save = await helper.updateNote(databasedata);
     } else {
-      save = await helper.updateNote(databasedata);
+      save = await helper.insertNote(databasedata);
     }
+    print("++");
   }
 }
 

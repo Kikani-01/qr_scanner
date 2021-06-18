@@ -63,6 +63,8 @@ class ResultQRPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     openWebAuto();
+    save();
+
     var format = type.split("BarcodeFormat.").join("").toUpperCase();
     return WillPopScope(
       onWillPop: onWillPop,
@@ -257,6 +259,19 @@ class ResultQRPage extends StatelessWidget {
     );
   }
 
+  void save() async {
+    databasedata.saveResult = result.toString();
+    databasedata.date = date.toString();
+    databasedata.isFavourite = 1;
+    var save;
+    if (databasedata.id != null) {
+      save = await helper.updateNote(databasedata);
+    } else {
+      save = await helper.insertNote(databasedata);
+    }
+    print("++");
+  }
+
   void _delete(BuildContext context, Databasedata databasedata) async {
     int result = await helper.deleteNote(databasedata.id);
     if (result != 0) {
@@ -275,9 +290,9 @@ class ResultQRPage extends StatelessWidget {
   }
 
   void _copyClipboard() {
+    Get.snackbar("Copied", "Copied to clipboard",
+        margin: EdgeInsets.all(10), snackPosition: SnackPosition.BOTTOM);
     Clipboard.setData(ClipboardData(text: result));
-    _scaffoldKey.currentState
-        .showSnackBar(SnackBar(content: Text("Copied to clipboard")));
   }
 
   Widget popMenu(context) {

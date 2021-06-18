@@ -82,6 +82,12 @@ class DatabaseHelper {
     return result;
   }
 
+  Future<int> deleteAll() async {
+    var db = await this.database;
+    int result = await db.rawDelete('DELETE FROM History');
+    return result;
+  }
+
 /*  Future<int> getCount() async {
     var db = await this.database;
     List<Map<String, dynamic>> x =

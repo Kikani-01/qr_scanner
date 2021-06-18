@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'Code/code39.dart';
 import 'Code/code_128.dart';
 import 'Code/code_93.dart';
@@ -13,7 +12,6 @@ import 'UPC/upc_a.dart';
 import 'UPC/upc_e.dart';
 
 class BarcodesAnd2DCodes extends StatelessWidget {
-  var result = 20;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:qr_scann/Controller/history_controller.dart';
 import 'package:qr_scann/DataBase/getdata.dart';
 import 'package:qr_scann/Pages/Ads/add.dart';
+import 'package:share/share.dart';
 
 import 'history_in_brief.dart';
 
@@ -30,15 +31,15 @@ class History extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 15.0),
                   child: Row(
                     children: [
-                      // Don't know what is
-                      Text("Export"),
-                      SizedBox(
-                        width: 15,
-                      ),
                       // Don't know what is'
-                      Text("Import"),
-                      SizedBox(
-                        width: 10,
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          deleteAll(context);
+                        },
                       ),
                     ],
                   ),
@@ -81,16 +82,8 @@ class History extends StatelessWidget {
                                 ),
                                 subtitle: Text(
                                     control.noteList[index].date.toString()),
-                                trailing: InkWell(
-                                  onTap: () {
-                                    _delete(context, control.noteList[index]);
-                                  },
-                                  child: Container(
-                                    height: 50,
-                                    width: 50,
-                                    child: Icon(Icons.delete),
-                                  ),
-                                ),
+                                trailing:
+                                    popMenu(context, control.noteList[index]),
                                 onLongPress: () {
                                   print("onLongPress");
                                 },
@@ -127,17 +120,61 @@ class History extends StatelessWidget {
     );
   }
 
-  void _delete(BuildContext context, Databasedata databasedata) async {
+  void delete(BuildContext context, Databasedata databasedata) async {
     var delete = await control.helper.deleteNote(databasedata.id);
     if (delete != 0) {
       control.updateListView();
       Get.snackbar('Successfully', '1 entry Deleted.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.white,
+          colorText: Colors.black,
           dismissDirection: SnackDismissDirection.HORIZONTAL,
           duration: Duration(milliseconds: 1000),
           margin: EdgeInsets.all(10));
     }
+  }
+
+  void deleteAll(context) {
+    Get.defaultDialog(
+        title: "Delete",
+        content: Container(
+          height: MediaQuery.of(context).size.height * 0.12,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.info,
+                color: Colors.red,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                // color: Colors.cyan,
+                child: Text("Do you want to delete all history ?"),
+              ),
+            ],
+          ),
+        ),
+        onCancel: () {
+          Get.back();
+        },
+        textConfirm: "    Delete    ",
+        textCancel: "    Cancel    ",
+        confirmTextColor: Colors.white,
+        onConfirm: () async {
+          var delete = await control.helper.deleteAll();
+          Get.back();
+          if (delete != 0) {
+            control.updateListView();
+            Get.snackbar("Delete", 'Delete your entire history',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.white,
+                dismissDirection: SnackDismissDirection.HORIZONTAL,
+                margin: EdgeInsets.all(10));
+          }
+        });
   }
 
   void _navigateToDetail(Databasedata databasedata) async {
@@ -148,4 +185,54 @@ class History extends StatelessWidget {
       control.updateListView();
     }
   }
+
+  MenuOption select;
+
+  Widget popMenu(context, Databasedata databasedata) {
+    return PopupMenuButton<MenuOption>(
+      onSelected: (MenuOption result) {
+        select = result;
+        switch (select) {
+          case MenuOption.CSV:
+            {}
+            break;
+          case MenuOption.TXT:
+            {
+              context.findRenderObject();
+              Share.share(
+                databasedata.saveResult,
+                subject: databasedata.saveResult,
+              );
+            }
+            break;
+          case MenuOption.Delete:
+            {
+              delete(context, databasedata);
+            }
+            break;
+        }
+      },
+      child: Icon(Icons.more_vert),
+      itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
+        PopupMenuItem(
+          child: Text("CSV"),
+          value: MenuOption.CSV,
+        ),
+        PopupMenuItem(
+          child: Text("TXT"),
+          value: MenuOption.TXT,
+        ),
+        PopupMenuItem(
+          child: Text("Delete"),
+          value: MenuOption.Delete,
+        ),
+      ],
+    );
+  }
+}
+
+enum MenuOption {
+  CSV,
+  TXT,
+  Delete,
 }
