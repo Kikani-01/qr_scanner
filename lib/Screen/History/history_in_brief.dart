@@ -41,7 +41,7 @@ class HistoryBrief extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
-              _delete(context);
+              delete(context);
             },
           ),
           Builder(builder: (context) {
@@ -137,13 +137,11 @@ class HistoryBrief extends StatelessWidget {
                       Row(
                         children: [
                           IconButton(
-                              icon: databasedata.isFavourite == 1
-                                  ? Icon(Icons.star_border)
-                                  : Icon(Icons.star),
+                              icon: Icon(Icons.star_border),
                               onPressed: () {
-                                favourite();
+                                // favourite();
                               }),
-                          InkWell(
+                          /*InkWell(
                             child: Container(
                               height: 50,
                               width: 50,
@@ -152,7 +150,7 @@ class HistoryBrief extends StatelessWidget {
                             onTap: () {
                               showAlertDialog();
                             },
-                          ),
+                          ),*/
                           InkWell(
                             child: Container(
                               height: 50,
@@ -160,9 +158,7 @@ class HistoryBrief extends StatelessWidget {
                               child: Icon(Icons.copy),
                             ),
                             onTap: () {
-                              _copyClipboard();
-                              Clipboard.setData(new ClipboardData(
-                                  text: databasedata.saveResult));
+                              copyClipboard();
                             },
                           ),
                         ],
@@ -206,6 +202,7 @@ class HistoryBrief extends StatelessWidget {
     );
   }
 
+/*
   void _save() async {
     var save;
     if (databasedata.isFavourite == 2) {
@@ -214,37 +211,51 @@ class HistoryBrief extends StatelessWidget {
       save = await helper.updateNote(databasedata);
     }
   }
+*/
 
-  void _delete(BuildContext context) async {
+  void delete(BuildContext context) async {
     await helper.deleteNote(databasedata.id);
     control.updateListView();
     Get.back();
+    Get.snackbar('Successfully', '1 entry Deleted.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        dismissDirection: SnackDismissDirection.HORIZONTAL,
+        duration: Duration(milliseconds: 1000),
+        margin: EdgeInsets.all(10));
   }
 
-  void _copyClipboard() {
-    _scaffoldKey.currentState
-        .showSnackBar(SnackBar(content: Text("Copied to clipboard")));
-    Clipboard.setData(new ClipboardData(
-      text: databasedata.saveResult,
-    ));
+  void copyClipboard() {
+    Get.snackbar("Copied", "Copied to clipboard",
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.black,
+        margin: EdgeInsets.all(10),
+        backgroundColor: Colors.white);
+    Clipboard.setData(ClipboardData(text: databasedata.saveResult));
   }
 
   showAlertDialog() {
     Get.defaultDialog(
-      content: TextFormField(
-        controller: _textController,
-        validator: (value) => value.isEmpty ? "Required" : null,
-        decoration: InputDecoration(
-          hintText: "Notes",
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.orange),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.orange),
-          ),
-        ),
-        cursorColor: Colors.orange,
-      ),
+      title: "Notes",
+      content: Padding(
+          padding: EdgeInsets.all(10),
+          child: TextFormField(
+            controller: _textController,
+            validator: (value) => value.isEmpty ? "Required" : null,
+            decoration: InputDecoration(
+              hintText: "Title",
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.orange),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.orange),
+              ),
+            ),
+            cursorColor: Colors.orange,
+          )),
+      textConfirm: "Save",
+      confirmTextColor: Colors.white,
       onCancel: () {
         Get.back();
       },
@@ -259,17 +270,17 @@ class HistoryBrief extends StatelessWidget {
         switch (select) {
           case MenuOption.Favorites:
             {
-              favourite();
+              // favourite();
             }
             break;
-          case MenuOption.Notes:
+          /*case MenuOption.Notes:
             {
               showAlertDialog();
             }
-            break;
+            break;*/
           case MenuOption.Copy:
             {
-              _copyClipboard();
+              copyClipboard();
             }
             break;
         }
@@ -283,10 +294,10 @@ class HistoryBrief extends StatelessWidget {
           child: Text(add.value),
           value: MenuOption.Favorites,
         ),
-        PopupMenuItem(
+        /*PopupMenuItem(
           child: Text("Notes"),
           value: MenuOption.Notes,
-        ),
+        ),*/
         PopupMenuItem(
           child: Text("Copy Code"),
           value: MenuOption.Copy,
@@ -294,22 +305,9 @@ class HistoryBrief extends StatelessWidget {
       ],
     );
   }
-
-  favourite() {
-    if (databasedata.isFavourite == 1) {
-      _save();
-      add.value = "Remove to favourite";
-      databasedata.isFavourite = 2;
-    } else if (databasedata.isFavourite == 2) {
-      _save();
-      add.value = "Add to favourite";
-      databasedata.isFavourite = 1;
-    }
-  }
 }
 
 enum MenuOption {
   Favorites,
-  Notes,
   Copy,
 }

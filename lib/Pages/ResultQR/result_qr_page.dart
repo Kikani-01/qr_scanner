@@ -13,13 +13,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 enum MenuOption {
   Favorites,
-  Notes,
   Copy,
 }
 
 class ResultQRPage extends StatelessWidget {
   DatabaseHelper helper = DatabaseHelper();
   Databasedata databasedata = Databasedata();
+  final TextEditingController _textController = TextEditingController();
   List<Databasedata> noteList;
   final init = Get.put(ScanController());
   var result;
@@ -36,35 +36,36 @@ class ResultQRPage extends StatelessWidget {
     if (await canLaunch(command)) {
       await launch(command);
     } else {
-      print("Could not launch $command");
+      Get.snackbar("Invalid", "Could not launch $command",
+          snackPosition: SnackPosition.BOTTOM,
+          margin: EdgeInsets.all(10),
+          backgroundColor: Colors.white,
+          colorText: Colors.black);
     }
-  }
-
-  var openWebSite = false.obs;
-
-  openWebAuto() async {
-    await SharedPreferences.getInstance().then((value) async {
-      final openWebsite = value.getBool("openWebsite");
-      if (openWebsite == null) {
-        openWebSite.value = false;
-      } else {
-        openWebSite.value = openWebsite;
-      }
-      if (openWebSite.value) {
-        customLaunch(result);
-      }
-    });
   }
 
   Future<bool> onWillPop() async {
     Get.back(result: true);
   }
 
+  RxBool duplicate = true.obs;
+  void settingsData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    final duplicatepref = pref.getBool("duplicate");
+    if (duplicatepref == null) {
+      duplicate.value = true;
+    } else {
+      duplicate.value = duplicatepref;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    openWebAuto();
-    save();
-
+    settingsData();
+    if (duplicate.value) {
+      save();
+    }
     var format = type.split("BarcodeFormat.").join("").toUpperCase();
     return WillPopScope(
       onWillPop: onWillPop,
@@ -88,7 +89,7 @@ class ResultQRPage extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
-                _delete(context, databasedata);
+                delete(context, databasedata);
                 onWillPop();
               },
             ),
@@ -124,7 +125,7 @@ class ResultQRPage extends StatelessWidget {
                           ),
                         ),
                         onTap: () {
-                          // customLaunch(init.result);
+                          customLaunch(init.result);
                         },
                       ),
                     ),
@@ -191,15 +192,9 @@ class ResultQRPage extends StatelessWidget {
                                     icon: Icon(Icons.star_border),
                                     onPressed: () {}),
                                 IconButton(
-                                  icon: Icon(Icons.edit),
-                                  onPressed: () {
-                                    // showAlertDialog(context);
-                                  },
-                                ),
-                                IconButton(
                                   icon: Icon(Icons.copy),
                                   onPressed: () {
-                                    _copyClipboard();
+                                    copyClipboard();
                                   },
                                 ),
                                 SizedBox(
@@ -272,7 +267,7 @@ class ResultQRPage extends StatelessWidget {
     print("++");
   }
 
-  void _delete(BuildContext context, Databasedata databasedata) async {
+  void delete(BuildContext context, Databasedata databasedata) async {
     int result = await helper.deleteNote(databasedata.id);
     if (result != 0) {
       updateListView();
@@ -289,7 +284,7 @@ class ResultQRPage extends StatelessWidget {
     });
   }
 
-  void _copyClipboard() {
+  void copyClipboard() {
     Get.snackbar("Copied", "Copied to clipboard",
         margin: EdgeInsets.all(10), snackPosition: SnackPosition.BOTTOM);
     Clipboard.setData(ClipboardData(text: result));
@@ -305,14 +300,14 @@ class ResultQRPage extends StatelessWidget {
               // favourite();
             }
             break;
-          case MenuOption.Notes:
+          /* case MenuOption.Notes:
             {
-              // showAlertDialog(context);
+              showAlertDialog();
             }
-            break;
+            break;*/
           case MenuOption.Copy:
             {
-              _copyClipboard();
+              copyClipboard();
             }
             break;
         }
@@ -328,10 +323,10 @@ class ResultQRPage extends StatelessWidget {
           ),
           value: MenuOption.Favorites,
         ),
-        PopupMenuItem(
+        /* PopupMenuItem(
           child: Text("Notes"),
           value: MenuOption.Notes,
-        ),
+        ),*/
         PopupMenuItem(
           child: Text("Copy Code"),
           value: MenuOption.Copy,
@@ -348,4 +343,32 @@ class ResultQRPage extends StatelessWidget {
   //     save = await helper.updateNote(databasedata);
   //   }
   // }
+
+  showAlertDialog() {
+    Get.defaultDialog(
+      title: "Notes",
+      content: Padding(
+          padding: EdgeInsets.all(10),
+          child: TextFormField(
+            controller: _textController,
+            validator: (value) => value.isEmpty ? "Required" : null,
+            decoration: InputDecoration(
+              hintText: "Title",
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.orange),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.orange),
+              ),
+            ),
+            cursorColor: Colors.orange,
+          )),
+      textConfirm: "Save",
+      confirmTextColor: Colors.white,
+      onCancel: () {
+        Get.back();
+      },
+      onConfirm: () {},
+    );
+  }
 }

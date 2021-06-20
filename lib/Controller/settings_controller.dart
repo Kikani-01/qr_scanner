@@ -73,7 +73,6 @@ class SettingsController extends GetxController {
   RxBool usageStatistics = false.obs;
 
   saveInSharedPref() async {
-    print(vibrate.value);
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool("openWebsite", openWebsite.value);
     pref.setBool("continuous", continuous.value);
@@ -118,9 +117,17 @@ class SettingsController extends GetxController {
 
   Future<void> loadValue() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    print("VibValue" + vibrate.value.toString());
-    print("VibValue" + pref.getBool("vibrate").toString());
+    selectedTheme.value = pref.getString("ThemeMode") ?? "System Default";
+    openWebsite.value = pref.getBool("openWebsite") ?? false;
+    continuous.value = pref.getBool("continuous") ?? false;
+    duplicate.value = pref.getBool("duplicate") ?? false;
+    confirm.value = pref.getBool("confirm") ?? false;
+    sound.value = pref.getBool("sound") ?? false;
     vibrate.value = pref.getBool("vibrate") ?? false;
+    copy.value = pref.getBool("copy") ?? false;
+    productsInformation.value = pref.getBool("productsInformation") ?? false;
+    usageStatistics.value = pref.getBool("usageStatistics") ?? false;
+    selectedCamera.value = pref.getString("ChangeCamera") ?? "Back Camera";
   }
 
   toggleVibrate(bool value) {

@@ -10,9 +10,12 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qr_code_tools/qr_code_tools.dart';
+import 'package:qr_scann/DataBase/databasehelper.dart';
+import 'package:qr_scann/DataBase/getdata.dart';
 import 'package:qr_scann/Pages/ResultQR/result_qr_page.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
 
 class ScanController extends GetxController {
@@ -72,6 +75,14 @@ class ScanController extends GetxController {
     }
   }
 
+  void customLaunch(command) async {
+    if (await canLaunch(command)) {
+      await launch(command);
+    } else {
+      print("Could not launch $command");
+    }
+  }
+
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController controller;
   AudioCache audioCache;
@@ -86,29 +97,53 @@ class ScanController extends GetxController {
   RxBool sound = true.obs;
   RxBool vibrate = true.obs;
   RxBool copy = true.obs;
+  RxBool continuous = false.obs;
+  RxBool openWebSite = false.obs;
+  RxBool duplicate = true.obs;
 
   void settingsData() async {
-    SharedPreferences value = await SharedPreferences.getInstance();
+    SharedPreferences pref = await SharedPreferences.getInstance();
 
-    final soundpref = value.getBool("sound");
+    final soundpref = pref.getBool("sound");
     if (soundpref == null) {
       sound.value = true;
     } else {
       sound.value = soundpref;
     }
 
-    final vibratepref = value.getBool("vibrate");
+    final vibratepref = pref.getBool("vibrate");
     if (vibratepref == null) {
       vibrate.value = true;
     } else {
       vibrate.value = vibratepref;
     }
 
-    final copypref = value.getBool("copy");
+    final copypref = pref.getBool("copy");
     if (copypref == null) {
       copy.value = true;
     } else {
       copy.value = copypref;
+    }
+
+    final continuouspref = pref.getBool("continuous");
+    if (continuouspref == null) {
+      continuous.value = false;
+    } else {
+      continuous.value = continuouspref;
+    }
+
+    final openWebsite = pref.getBool("openWebsite");
+    if (openWebsite == null) {
+      openWebSite.value = false;
+    } else {
+      openWebSite.value = openWebsite;
+    }
+
+    final duplicatePref = pref.getBool("openWebsite");
+    if (duplicatePref == null) {
+      duplicate.value = false;
+    } else {
+      duplicate.value = duplicatePref;
     }
     update();
   }
@@ -126,7 +161,6 @@ class ScanController extends GetxController {
     } else if (soundpref == "Back Camera") {
       camera = CameraFacing.back;
     }
-    update();
   }
 
   buildQrView(BuildContext context) {
@@ -177,9 +211,18 @@ class ScanController extends GetxController {
       if (copy.value) {
         Clipboard.setData(ClipboardData(text: result));
       }
-
-      final data = await Get.to(() => ResultQRPage(result, type, date));
-
+      var data;
+      if (continuous.value == false) {
+        if (openWebSite.value) {
+          customLaunch(result);
+        }
+        data = await Get.to(() => ResultQRPage(result, type, date));
+      } else {
+        if (duplicate.value) {
+          save();
+        }
+        controller.resumeCamera();
+      }
       if (data == true) {
         controller.resumeCamera();
       } else if (data == null) {
@@ -188,5 +231,19 @@ class ScanController extends GetxController {
         controller.pauseCamera();
       }
     });
+  }
+
+  DatabaseHelper helper = DatabaseHelper();
+  Databasedata databasedata = Databasedata();
+  void save() async {
+    databasedata.saveResult = result.toString();
+    databasedata.date = date.toString();
+    databasedata.isFavourite = 1;
+    var save;
+    if (databasedata.id != null) {
+      save = await helper.updateNote(databasedata);
+    } else {
+      save = await helper.insertNote(databasedata);
+    }
   }
 }

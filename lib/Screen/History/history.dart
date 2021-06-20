@@ -55,45 +55,59 @@ class History extends StatelessWidget {
                 () => SingleChildScrollView(
                   child: Column(
                     children: [
-                      if (control.count.value == 0)
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.68,
-                          child: Center(
-                              child: Text(
-                            "Your scans will be listed here.",
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          )),
-                        ),
-                      if (control.count.value != 0)
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.65,
-                          child: ListView.builder(
-                            itemCount: control.count.value,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                title: Text(
-                                  control.noteList[index].saveResult,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                  ),
+                      control.count.value != 0
+                          ? Container(
+                              height: MediaQuery.of(context).size.height * 0.65,
+                              child: ListView.builder(
+                                itemCount: control.count.value,
+                                reverse: true,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    title: Text(
+                                      control.noteList[index].saveResult,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                    subtitle: Text(control.noteList[index].date
+                                        .toString()),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon: control.noteList[index]
+                                                      .isFavourite ==
+                                                  1
+                                              ? Container()
+                                              : Icon(Icons.star),
+                                        ),
+                                        popMenu(
+                                            context, control.noteList[index]),
+                                      ],
+                                    ),
+                                    onLongPress: () {
+                                      print("onLongPress");
+                                    },
+                                    onTap: () {
+                                      _navigateToDetail(
+                                          control.noteList[index]);
+                                    },
+                                  );
+                                },
+                              ),
+                            )
+                          : Container(
+                              height: MediaQuery.of(context).size.height * 0.68,
+                              child: Center(
+                                  child: Text(
+                                "Your scans will be listed here.",
+                                style: TextStyle(
+                                  fontSize: 20,
                                 ),
-                                subtitle: Text(
-                                    control.noteList[index].date.toString()),
-                                trailing:
-                                    popMenu(context, control.noteList[index]),
-                                onLongPress: () {
-                                  print("onLongPress");
-                                },
-                                onTap: () {
-                                  _navigateToDetail(control.noteList[index]);
-                                },
-                              );
-                            },
-                          ),
-                        ),
+                              )),
+                            ),
                     ],
                   ),
                 ),
