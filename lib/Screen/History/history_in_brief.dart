@@ -10,12 +10,11 @@ import 'package:url_launcher/url_launcher.dart';
 class HistoryBrief extends StatelessWidget {
   Databasedata databasedata = Databasedata();
   DatabaseHelper helper = DatabaseHelper();
-  var add = "Add to favourites".obs;
   final control = Get.put(HistoryController());
+
   HistoryBrief(this.databasedata);
 
   MenuOption select;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _textController = TextEditingController();
 
   void customLaunch(command) async {
@@ -29,7 +28,6 @@ class HistoryBrief extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.cyan,
@@ -38,12 +36,6 @@ class HistoryBrief extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              delete(context);
-            },
-          ),
           Builder(builder: (context) {
             return IconButton(
                 icon: Icon(Icons.share),
@@ -58,146 +50,136 @@ class HistoryBrief extends StatelessWidget {
           popMenu(),
         ],
       ),
-      body: Builder(
-        builder: (context) => Column(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: GestureDetector(
-                    child: SelectableText(
-                      databasedata.saveResult,
-                      cursorColor: Colors.red,
-                      showCursor: false,
-                      autofocus: false,
-                      enableInteractiveSelection: true,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                    onTap: () {
-                      customLaunch(databasedata.saveResult);
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Text(
-                    "QR Code",
+      body: Column(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: GestureDetector(
+                  child: SelectableText(
+                    databasedata.saveResult,
+                    cursorColor: Colors.red,
+                    showCursor: false,
+                    autofocus: false,
+                    enableInteractiveSelection: true,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 20,
                     ),
                   ),
+                  onTap: () {
+                    customLaunch(databasedata.saveResult);
+                  },
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 15.0,
-                  ),
-                  child: Text(
-                    databasedata.date,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 15.0,
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 15.0, right: 15.0, top: 20.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 35,
-                        width: 35,
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Icon(
-                          Icons.qr_code,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 23,
-                      ),
-                      Text(
-                        "View code",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18.0,
-                        ),
-                      ),
-                      Spacer(
-                        flex: 2,
-                      ),
-                      Row(
-                        children: [
-                          IconButton(
-                              icon: Icon(Icons.star_border),
-                              onPressed: () {
-                                // favourite();
-                              }),
-                          /*InkWell(
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              child: Icon(Icons.edit),
-                            ),
-                            onTap: () {
-                              showAlertDialog();
-                            },
-                          ),*/
-                          InkWell(
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              child: Icon(Icons.copy),
-                            ),
-                            onTap: () {
-                              copyClipboard();
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+                child: Text(
+                  databasedata.date,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 15.0),
-                  child: ListTile(
-                    leading: Container(
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.only(left: 15.0, right: 15.0, top: 20.0),
+                child: Row(
+                  children: [
+                    Container(
                       height: 35,
                       width: 35,
                       decoration: BoxDecoration(
-                        color: Colors.orange,
+                        color: Colors.grey,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Icon(
-                        Icons.open_in_browser,
-                        color: Colors.white,
+                        Icons.qr_code,
                         size: 20,
+                        color: Colors.white,
                       ),
                     ),
-                    title: Text(
-                      "Open website",
+                    SizedBox(
+                      width: 23,
+                    ),
+                    Text(
+                      "View code",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 18.0,
                       ),
                     ),
-                    onTap: () {
-                      customLaunch(databasedata.saveResult);
-                    },
-                  ),
+                    Spacer(
+                      flex: 2,
+                    ),
+                    Row(
+                      children: [
+                        Obx(
+                          () => IconButton(
+                            icon: control.favorite.value == true
+                                ? databasedata.isFavourite == 1
+                                    ? Icon(Icons.star_border)
+                                    : Icon(Icons.star)
+                                : databasedata.isFavourite == 1
+                                    ? Icon(Icons.star_border)
+                                    : Icon(Icons.star),
+                            onPressed: () {
+                              control.favoriteChange(databasedata);
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            delete(context);
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.copy),
+                          onPressed: () {
+                            copyClipboard();
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 15.0),
+                child: ListTile(
+                  leading: Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Icon(
+                      Icons.open_in_browser,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  title: Text(
+                    "Open website",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                  onTap: () {
+                    customLaunch(databasedata.saveResult);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -270,7 +252,7 @@ class HistoryBrief extends StatelessWidget {
         switch (select) {
           case MenuOption.Favorites:
             {
-              // favourite();
+              control.favoriteChange(databasedata);
             }
             break;
           /*case MenuOption.Notes:
@@ -291,7 +273,7 @@ class HistoryBrief extends StatelessWidget {
       ),
       itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
         PopupMenuItem(
-          child: Text(add.value),
+          child: Obx(() => Text(control.add.value)),
           value: MenuOption.Favorites,
         ),
         /*PopupMenuItem(

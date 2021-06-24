@@ -111,7 +111,7 @@ class CreateAllResult extends StatelessWidget {
                       child: Text(
                         type,
                         style: TextStyle(
-                          fontSize: 18.0,
+                          fontSize: 15.0,
                         ),
                       ),
                     ),
@@ -120,7 +120,7 @@ class CreateAllResult extends StatelessWidget {
                       child: Text(
                         result,
                         style: TextStyle(
-                          fontSize: 15.0,
+                          fontSize: 18.0,
                         ),
                       ),
                     ),
@@ -129,7 +129,7 @@ class CreateAllResult extends StatelessWidget {
                       child: Text(
                         date,
                         style: TextStyle(
-                          fontSize: 18.0,
+                          fontSize: 15.0,
                         ),
                       ),
                     ),

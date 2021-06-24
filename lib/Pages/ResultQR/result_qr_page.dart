@@ -125,7 +125,7 @@ class ResultQRPage extends StatelessWidget {
                           ),
                         ),
                         onTap: () {
-                          customLaunch(init.result);
+                          customLaunch(result);
                         },
                       ),
                     ),
@@ -228,7 +228,7 @@ class ResultQRPage extends StatelessWidget {
                         ),
                       ),
                       onTap: () {
-                        customLaunch(init.result);
+                        customLaunch(result);
                       },
                     ),
                   ],

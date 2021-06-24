@@ -153,14 +153,16 @@ class ScanController extends GetxController {
 
   changeCamera() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    final soundpref = preferences.getString("ChangeCamera");
-    if (soundpref == null) {
-      camera = CameraFacing.back;
-    } else if (soundpref == "Front Camera") {
-      camera = CameraFacing.front;
-    } else if (soundpref == "Back Camera") {
-      camera = CameraFacing.back;
-    }
+    SharedPreferences.getInstance().then((value) {
+      final soundpref = preferences.getString("ChangeCamera");
+      if (soundpref == null) {
+        camera = CameraFacing.back;
+      } else if (soundpref == "Front Camera") {
+        camera = CameraFacing.front;
+      } else if (soundpref == "Back Camera") {
+        camera = CameraFacing.back;
+      }
+    });
   }
 
   buildQrView(BuildContext context) {

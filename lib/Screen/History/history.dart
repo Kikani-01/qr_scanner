@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:qr_scann/Controller/history_controller.dart';
 import 'package:qr_scann/DataBase/getdata.dart';
@@ -9,6 +10,7 @@ import 'history_in_brief.dart';
 
 class History extends StatelessWidget {
   final control = Get.put(HistoryController());
+
   // String add = "add to Favourite";
   // bool isFavorite = true;
   @override
@@ -60,7 +62,7 @@ class History extends StatelessWidget {
                               height: MediaQuery.of(context).size.height * 0.65,
                               child: ListView.builder(
                                 itemCount: control.count.value,
-                                reverse: true,
+                                // reverse: true,
                                 itemBuilder: (context, index) {
                                   return ListTile(
                                     title: Text(
@@ -75,13 +77,24 @@ class History extends StatelessWidget {
                                     trailing: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        IconButton(
-                                          onPressed: () {},
-                                          icon: control.noteList[index]
-                                                      .isFavourite ==
-                                                  1
-                                              ? Container()
-                                              : Icon(Icons.star),
+                                        Obx(
+                                          () => IconButton(
+                                            icon:
+                                                control.favorite.value == false
+                                                    ? control.noteList[index]
+                                                                .isFavourite ==
+                                                            1
+                                                        ? Container()
+                                                        : Icon(Icons.star)
+                                                    : control.noteList[index]
+                                                                .isFavourite ==
+                                                            1
+                                                        ? Container()
+                                                        : Icon(Icons.star),
+                                            onPressed: () {
+                                              control.favoriteChangeMain(index);
+                                            },
+                                          ),
                                         ),
                                         popMenu(
                                             context, control.noteList[index]),
