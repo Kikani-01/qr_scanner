@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:qr_scann/Controller/result_qr_code.dart';
 import 'package:qr_scann/DataBase/databasehelper.dart';
 import 'package:qr_scann/DataBase/getdata.dart';
 import 'package:qr_scann/Screen/Create/create_all_result.dart';
@@ -19,18 +18,14 @@ enum MenuOption {
 class ResultQRPage extends StatelessWidget {
   DatabaseHelper helper = DatabaseHelper();
   Databasedata databasedata = Databasedata();
-  final TextEditingController _textController = TextEditingController();
   List<Databasedata> noteList;
-  final init = Get.put(ScanController());
   var result;
   var type;
   var date;
-  int isFavourite;
+  RxBool favourite = true.obs;
   ResultQRPage(this.result, this.type, this.date);
   MenuOption select;
   var add = "Add to favourites".obs;
-
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void customLaunch(command) async {
     if (await canLaunch(command)) {
@@ -44,6 +39,7 @@ class ResultQRPage extends StatelessWidget {
     }
   }
 
+  // ignore: missing_return
   Future<bool> onWillPop() async {
     Get.back(result: true);
   }
@@ -51,7 +47,6 @@ class ResultQRPage extends StatelessWidget {
   RxBool duplicate = true.obs;
   void settingsData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-
     final duplicatepref = pref.getBool("duplicate");
     if (duplicatepref == null) {
       duplicate.value = true;
@@ -70,7 +65,6 @@ class ResultQRPage extends StatelessWidget {
     return WillPopScope(
       onWillPop: onWillPop,
       child: Scaffold(
-        key: _scaffoldKey,
         appBar: AppBar(
           leading: IconButton(
               icon: Icon(Icons.arrow_back_sharp),
@@ -104,7 +98,7 @@ class ResultQRPage extends StatelessWidget {
                     );
                   });
             }),
-            popMenu(context),
+            popMenu(context, databasedata),
           ],
         ),
         body: Column(
@@ -188,9 +182,20 @@ class ResultQRPage extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                IconButton(
-                                    icon: Icon(Icons.star_border),
-                                    onPressed: () {}),
+                                Obx(
+                                  () => IconButton(
+                                    icon: favourite.value == true
+                                        ? databasedata.isFavourite == 1
+                                            ? Icon(Icons.star_border)
+                                            : Icon(Icons.star)
+                                        : databasedata.isFavourite == 1
+                                            ? Icon(Icons.star_border)
+                                            : Icon(Icons.star),
+                                    onPressed: () {
+                                      favoriteChange(databasedata);
+                                    },
+                                  ),
+                                ),
                                 IconButton(
                                   icon: Icon(Icons.copy),
                                   onPressed: () {
@@ -254,6 +259,42 @@ class ResultQRPage extends StatelessWidget {
     );
   }
 
+  Widget popMenu(context, database) {
+    return PopupMenuButton<MenuOption>(
+      onSelected: (MenuOption result) {
+        select = result;
+        switch (select) {
+          case MenuOption.Favorites:
+            {
+              favoriteChange(databasedata);
+            }
+            break;
+          case MenuOption.Copy:
+            {
+              copyClipboard();
+            }
+            break;
+        }
+      },
+      icon: Icon(
+        Icons.more_vert,
+        color: Colors.white,
+      ),
+      itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
+        PopupMenuItem(
+          child: Obx(
+            () => Text(add.value),
+          ),
+          value: MenuOption.Favorites,
+        ),
+        PopupMenuItem(
+          child: Text("Copy Code"),
+          value: MenuOption.Copy,
+        )
+      ],
+    );
+  }
+
   void save() async {
     databasedata.saveResult = result.toString();
     databasedata.date = date.toString();
@@ -264,7 +305,6 @@ class ResultQRPage extends StatelessWidget {
     } else {
       save = await helper.insertNote(databasedata);
     }
-    print("++");
   }
 
   void delete(BuildContext context, Databasedata databasedata) async {
@@ -290,85 +330,18 @@ class ResultQRPage extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: result));
   }
 
-  Widget popMenu(context) {
-    return PopupMenuButton<MenuOption>(
-      onSelected: (MenuOption result) {
-        select = result;
-        switch (select) {
-          case MenuOption.Favorites:
-            {
-              // favourite();
-            }
-            break;
-          /* case MenuOption.Notes:
-            {
-              showAlertDialog();
-            }
-            break;*/
-          case MenuOption.Copy:
-            {
-              copyClipboard();
-            }
-            break;
-        }
-      },
-      icon: Icon(
-        Icons.more_vert,
-        color: Colors.white,
-      ),
-      itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
-        PopupMenuItem(
-          child: Obx(
-            () => Text(add.value),
-          ),
-          value: MenuOption.Favorites,
-        ),
-        /* PopupMenuItem(
-          child: Text("Notes"),
-          value: MenuOption.Notes,
-        ),*/
-        PopupMenuItem(
-          child: Text("Copy Code"),
-          value: MenuOption.Copy,
-        )
-      ],
-    );
-  }
-
-  // void _save() async {
-  //   var save;
-  //   if (databasedata.isFavourite == 2) {
-  //     save = await helper.updateNote(databasedata);
-  //   } else {
-  //     save = await helper.updateNote(databasedata);
-  //   }
-  // }
-
-  showAlertDialog() {
-    Get.defaultDialog(
-      title: "Notes",
-      content: Padding(
-          padding: EdgeInsets.all(10),
-          child: TextFormField(
-            controller: _textController,
-            validator: (value) => value.isEmpty ? "Required" : null,
-            decoration: InputDecoration(
-              hintText: "Title",
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.orange),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.orange),
-              ),
-            ),
-            cursorColor: Colors.orange,
-          )),
-      textConfirm: "Save",
-      confirmTextColor: Colors.white,
-      onCancel: () {
-        Get.back();
-      },
-      onConfirm: () {},
-    );
+  favoriteChange(Databasedata databasedata) async {
+    var save;
+    if (databasedata.isFavourite == 1) {
+      databasedata.isFavourite = 2;
+      save = await helper.updateNote(databasedata);
+      add.value = "Remove from favourites";
+      favourite.value = false;
+    } else {
+      databasedata.isFavourite = 1;
+      save = await helper.updateNote(databasedata);
+      add.value = "Add to favourites";
+      favourite.value = true;
+    }
   }
 }

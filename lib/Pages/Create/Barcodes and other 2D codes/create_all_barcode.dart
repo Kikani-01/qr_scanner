@@ -22,9 +22,13 @@ class CreateAllBarcodes extends StatelessWidget {
   final String type;
   final String category;
   CreateAllBarcodes(this.result, this.type, this.category);
+  DatabaseHelper helper = DatabaseHelper();
+  Databasedata databasedata = Databasedata();
+  RxBool favourite = true.obs;
+
+  var add = "Add to favourites".obs;
 
   var date = DateFormat('dd-MM-yyyy  kk:mm').format(DateTime.now());
-  final TextEditingController _textController = TextEditingController();
 
   checkType(String test) {
     switch (test) {
@@ -95,31 +99,6 @@ class CreateAllBarcodes extends StatelessWidget {
     }
   }
 
-  showAlertDialog() {
-    Get.defaultDialog(
-      content: TextFormField(
-        controller: _textController,
-        validator: (value) => value.isEmpty ? "Required" : null,
-        decoration: InputDecoration(
-          hintText: "Notes",
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.orange),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.orange),
-          ),
-        ),
-        cursorColor: Colors.orange,
-      ),
-      onConfirm: () {},
-      textConfirm: 'OK',
-      onCancel: () {
-        Get.back();
-      },
-      textCancel: 'Cancel',
-    );
-  }
-
   GlobalKey globalKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
@@ -144,7 +123,7 @@ class CreateAllBarcodes extends StatelessWidget {
             SizedBox(
               width: 10,
             ),
-            popMenu(),
+            popMenu(databasedata),
           ],
         ),
         body: SingleChildScrollView(
@@ -218,20 +197,29 @@ class CreateAllBarcodes extends StatelessWidget {
   }
 
   MenuOption select;
+  favoriteChange(Databasedata databasedata) async {
+    var save;
+    if (databasedata.isFavourite == 1) {
+      databasedata.isFavourite = 2;
+      save = await helper.updateNote(databasedata);
+      add.value = "Remove from favourites";
+      favourite.value = false;
+    } else {
+      databasedata.isFavourite = 1;
+      save = await helper.updateNote(databasedata);
+      add.value = "Add to favourites";
+      favourite.value = true;
+    }
+  }
 
-  Widget popMenu() {
+  Widget popMenu(databasedata) {
     return PopupMenuButton<MenuOption>(
       onSelected: (MenuOption result) {
         select = result;
         switch (select) {
           case MenuOption.Favorites:
             {
-              // favourite();
-            }
-            break;
-          case MenuOption.Notes:
-            {
-              showAlertDialog();
+              favoriteChange(databasedata);
             }
             break;
           case MenuOption.Copy:
@@ -247,12 +235,8 @@ class CreateAllBarcodes extends StatelessWidget {
       ),
       itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
         PopupMenuItem(
-          child: Text("Favorites"),
+          child: Obx(() => Text(add.value)),
           value: MenuOption.Favorites,
-        ),
-        PopupMenuItem(
-          child: Text("Notes"),
-          value: MenuOption.Notes,
         ),
         PopupMenuItem(
           child: Text("Copy Code"),
@@ -308,6 +292,5 @@ class CreateAllBarcodes extends StatelessWidget {
 
 enum MenuOption {
   Favorites,
-  Notes,
   Copy,
 }

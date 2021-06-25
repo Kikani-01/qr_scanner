@@ -15,7 +15,6 @@ class Home extends StatelessWidget {
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
-          // ERROR TABBAR VIEW
           child: ResponsiveLayout(
             tab: tablate(),
             mobile: mobile(),

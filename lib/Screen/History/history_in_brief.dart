@@ -120,7 +120,7 @@ class HistoryBrief extends StatelessWidget {
                       children: [
                         Obx(
                           () => IconButton(
-                            icon: control.favorite.value == true
+                            icon: control.favourite.value == true
                                 ? databasedata.isFavourite == 1
                                     ? Icon(Icons.star_border)
                                     : Icon(Icons.star)

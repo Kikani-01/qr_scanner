@@ -80,9 +80,6 @@ class Scanner extends StatelessWidget {
                       onTap: control.getPhotoByGallery,
                     ),
                     InkWell(
-                      onTap: () {
-                        Get.to(Help());
-                      },
                       child: Column(
                         children: [
                           Icon(
@@ -102,6 +99,9 @@ class Scanner extends StatelessWidget {
                           ),
                         ],
                       ),
+                      onTap: () {
+                        Get.to(Help());
+                      },
                     ),
                   ],
                 ),

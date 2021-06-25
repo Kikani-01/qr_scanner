@@ -80,7 +80,7 @@ class History extends StatelessWidget {
                                         Obx(
                                           () => IconButton(
                                             icon:
-                                                control.favorite.value == false
+                                                control.favourite.value == false
                                                     ? control.noteList[index]
                                                                 .isFavourite ==
                                                             1

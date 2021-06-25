@@ -13,7 +13,7 @@ class HistoryController extends GetxController {
   Databasedata databasedata = Databasedata();
   DatabaseHelper helper = DatabaseHelper();
   List<Databasedata> noteList;
-  RxBool favorite = true.obs;
+  RxBool favourite = true.obs;
   var count = 0.obs;
   var add = "Add to favourites".obs;
 
@@ -35,14 +35,14 @@ class HistoryController extends GetxController {
       update();
       save = await helper.updateNote(databasedata);
       add.value = "Remove from favourites";
-      favorite.value = false;
+      favourite.value = false;
     } else {
       databasedata.isFavourite = 1;
       update();
 
       save = await helper.updateNote(databasedata);
       add.value = "Add to favourites";
-      favorite.value = true;
+      favourite.value = true;
     }
     update();
   }
@@ -53,11 +53,11 @@ class HistoryController extends GetxController {
       noteList[index].isFavourite = 2;
       save = await helper.updateNote(noteList[index]);
       add.value = "Remove from favourites";
-      favorite.value = false;
+      favourite.value = false;
     } else {
       noteList[index].isFavourite = 1;
       save = await helper.updateNote(noteList[index]);
-      favorite.value = true;
+      favourite.value = true;
       add.value = "Add to favourites";
     }
     update();

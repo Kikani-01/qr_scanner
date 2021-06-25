@@ -92,6 +92,7 @@ class ScanController extends GetxController {
     advancedPlayer = AudioPlayer();
     audioCache = AudioCache(fixedPlayer: advancedPlayer);
     settingsData();
+    print("initPlayer");
   }
 
   RxBool sound = true.obs;
@@ -203,7 +204,6 @@ class ScanController extends GetxController {
         await controller.pauseCamera();
       }
       type = scanData.format.toString();
-
       if (sound.value) {
         audioCache.play("music/beep_Trim.mp4");
       }
