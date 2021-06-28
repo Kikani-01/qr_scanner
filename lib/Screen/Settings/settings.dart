@@ -10,7 +10,6 @@ import 'package:qr_scann/Pages/Custom%20Search/custom_search_options.dart';
 import 'package:qr_scann/Pages/ScanProduct/scan_product.dart';
 import 'package:qr_scann/ThemeProvider/theme.dart';
 
-
 class Settings extends StatelessWidget {
   final controller = Get.put(SettingsController());
 
@@ -18,7 +17,6 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     themeProvider.getTheme;
-    print("Settings");
     return Scaffold(
       body: Column(
         children: [

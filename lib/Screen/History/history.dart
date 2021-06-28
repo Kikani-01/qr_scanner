@@ -11,11 +11,8 @@ import 'history_in_brief.dart';
 class History extends StatelessWidget {
   final control = Get.put(HistoryController());
 
-  // String add = "add to Favourite";
-  // bool isFavorite = true;
   @override
   Widget build(BuildContext context) {
-    print('History');
     return Scaffold(
       body: Column(
         children: [

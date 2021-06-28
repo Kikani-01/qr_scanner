@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_scann/Controller/result_qr_code.dart';
 import 'package:qr_scann/Help/help_and_feedback.dart';
-import 'package:qr_scann/Pages/Ads/add.dart';
 
 class Scanner extends StatelessWidget {
   RxBool light = true.obs;
@@ -118,7 +117,7 @@ class Scanner extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
+          /*Expanded(
             child: InkWell(
               onTap: () => Get.to(Ads()),
               child: Container(
@@ -132,7 +131,7 @@ class Scanner extends StatelessWidget {
                 ),
               ),
             ),
-          ),
+          ),*/
         ],
       ),
     );
